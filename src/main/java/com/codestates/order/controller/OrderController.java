@@ -10,6 +10,7 @@ import com.codestates.order.entity.Order;
 import com.codestates.order.mapper.OrderMapper;
 import com.codestates.order.service.OrderService;
 import com.codestates.stamp.Stamp;
+import com.codestates.utils.UriCreator;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.net.URI;
 import java.util.List;
 
 
@@ -25,6 +27,7 @@ import java.util.List;
 @RequestMapping("/v11/orders")
 @Validated
 public class OrderController {
+    private final static String ORDER_DEFAULT_URL = "/v11/orders";
     private final OrderService orderService;
     private final OrderMapper mapper;
     private final MemberService memberService;
@@ -40,11 +43,9 @@ public class OrderController {
     public ResponseEntity postOrder(@Valid @RequestBody OrderPostDto orderPostDto) {
         Order order = orderService.createOrder(mapper.orderPostDtoToOrder(orderPostDto));
 
-        updateStamp(order);
+        URI location = UriCreator.createUri(ORDER_DEFAULT_URL, order.getOrderId());
 
-        return new ResponseEntity<>(
-                new SingleResponseDto<>(mapper.orderToOrderResponseDto(order)),
-                HttpStatus.CREATED);
+        return ResponseEntity.created(location).build();
     }
 
     private void updateStamp(Order order) {
