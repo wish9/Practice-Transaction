@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 /**
@@ -17,6 +18,7 @@ import java.util.Optional;
  *  - Spring Data JPA 적용
  */
 @Service
+@Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
 
@@ -28,7 +30,12 @@ public class MemberService {
         // 이미 등록된 이메일인지 확인
         verifyExistsEmail(member.getEmail());
 
-        return memberRepository.save(member);
+        Member resultMember = memberRepository.save(member);
+
+        if (true) {  // Rollback test
+            throw new RuntimeException("Rollback test");
+        }
+        return resultMember;
     }
 
     public Member updateMember(Member member) {
