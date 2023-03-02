@@ -8,8 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 
 /**
@@ -38,6 +39,7 @@ public class MemberService {
         return resultMember;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED) // 트랜잭션에 참여하게 해주는 용도
     public Member updateMember(Member member) {
         Member findMember = findVerifiedMember(member.getMemberId());
 
@@ -51,6 +53,7 @@ public class MemberService {
         return memberRepository.save(findMember);
     }
 
+    @Transactional(readOnly = true) // 말 그대로 읽기전용으로 만들어 commit 절차를 진행하기는 하지만 JPA 내부적으로 영속성 컨텍스트를 flush하지 않도록 하는 방법
     public Member findMember(long memberId) {
         return findVerifiedMember(memberId);
     }

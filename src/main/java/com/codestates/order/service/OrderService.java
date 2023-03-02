@@ -12,10 +12,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Transactional
 @Service
 public class OrderService {
     private final MemberService memberService;
@@ -35,7 +37,9 @@ public class OrderService {
 
         updateStamp(savedOrder);
 
-        return savedOrder;
+        throw new RuntimeException("rollback test");
+
+//        return savedOrder;
     }
 
     public Order updateOrder(Order order) {
